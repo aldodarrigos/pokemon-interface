@@ -131,7 +131,7 @@ const PokemonByNamePage:FC<Props> = ({ pokemon }) => {
   export const getStaticProps:GetStaticProps = async ({params}) => {
   
     const { name } = params as {name: string};
-    const pokemon = await getPokemonInfo(name);
+    const pokemon = await getPokemonInfo(name.toLowerCase());
 
     if(!pokemon) {
       return {
