@@ -1,6 +1,7 @@
 import { Button, Card, Container, Grid, Image, Text } from '@nextui-org/react'
 import confetti from 'canvas-confetti'
 import { GetStaticPaths, GetStaticProps } from 'next'
+import { redirect } from 'next/dist/server/api-utils'
 import { useRouter } from 'next/router'
 import React, { FC, useState } from 'react'
 import pokeApi from '../../api/pokeApi'
@@ -121,7 +122,7 @@ const PokemonByNamePage:FC<Props> = ({ pokemon }) => {
                 name: v.name
             }
         })),
-      fallback: false, // can also be true or 'blocking'
+      fallback: 'blocking', // can also be true or 'blocking'
     }
   }
   
@@ -130,11 +131,22 @@ const PokemonByNamePage:FC<Props> = ({ pokemon }) => {
   export const getStaticProps:GetStaticProps = async ({params}) => {
   
     const { name } = params as {name: string};
+    const pokemon = await getPokemonInfo(name);
+
+    if(!pokemon) {
+      return {
+        redirect: {
+          destination:'/',
+          permanent: false 
+        } 
+      } 
+    }
 
     return {
       props: {
-         pokemon: await getPokemonInfo(name)
-      }
+         pokemon
+      },
+      revalidate: 86400, //Cada día se revalida si es la misma data
     }
   }
   
